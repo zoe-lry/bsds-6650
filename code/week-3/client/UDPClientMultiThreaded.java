@@ -1,28 +1,25 @@
 package socketexamples;
 
+
 /**
- * Skeleton socket client. 
- * Accepts host/port on command line or defaults to localhost/12031
- * Then (should) starts MAX_Threads and waits for them all to terminate before terminating main()
+ * Simple client to send request via a socket.
+ * Accepts host and port via command lina, defauklts to localhost and port 12031
  * @author Ian Gorton
  */
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
-public class SocketClientMultithreaded {
-    
-    static CyclicBarrier barrier; 
-    
+public class UDPClientMultiThreaded {
+    private static final int BUFFER_SIZE = 1024;
+    static CyclicBarrier barrier;
+
     public static void main(String[] args) throws BrokenBarrierException, InterruptedException {
         String hostName;
         final int MAX_THREADS = 100;
@@ -32,7 +29,7 @@ public class SocketClientMultithreaded {
             hostName = args[0];
             port = Integer.parseInt(args[1]);
         } else {
-            hostName= null;
+            hostName= "localhost";
             port = 12031;  // default port in SocketServer
         }
         long start = System.currentTimeMillis();
@@ -44,15 +41,13 @@ public class SocketClientMultithreaded {
         barrier = new CyclicBarrier(MAX_THREADS + 1);
         // TO DO create and start MAX_THREADS SocketClientThread
         IntStream.range(0, MAX_THREADS).forEach(i -> {
-            new SocketClientThread(hostName, port, barrier).start();
+            new UDPClientThread(hostName, port, barrier).start();
         });
         // TO DO wait for all threads to comple
         barrier.await(); // Main thread also waits here
+
         System.out.println("Terminating ....");
         System.out.println("Wall Time: " + (int)(System.currentTimeMillis() -  start));
 
-                
     }
-
-      
 }

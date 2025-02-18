@@ -16,10 +16,12 @@ class SocketHandlerThread extends Thread {
   private final Socket clientSocket;
   private boolean running = true;
   private final ActiveCount threadCount;
+  private String serverName;
 
   SocketHandlerThread(Socket s, ActiveCount threads) {
     clientSocket = s;
     threadCount = threads;
+    serverName = this.getName();
   }
 
   public void run() {
@@ -29,11 +31,11 @@ class SocketHandlerThread extends Thread {
     try {
       BufferedReader   in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       PrintWriter   out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-      
       String clientID = in.readLine();
+
       System.out.println("Client ID is :" + clientID);
-      out.println("Active Server Thread Count = " + Integer.toString( threadCount.getCount() ));
-      out.flush();    
+      out.println("Active Server Thread Count = " + threadCount.getCount() + " Server Name: " + serverName);
+      out.flush();
       System.out.println("Reply sent");
       
     } catch (Exception e) {

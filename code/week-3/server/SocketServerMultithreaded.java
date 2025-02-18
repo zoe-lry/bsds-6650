@@ -11,18 +11,18 @@ package socketexamples;
 
 
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
-
-public class SocketServer {
+public class SocketServerMultithreaded {
   public static void main(String[] args) throws Exception {
-    // create socket listener  
+    int POOL_SIZE = 1;
+    ExecutorService executorService = Executors.newFixedThreadPool(POOL_SIZE);
+    // create socket listener
+
     ServerSocket m_ServerSocket = new ServerSocket(12031);
     // create object o count active threads
     ActiveCount threadCount = new ActiveCount();
@@ -30,8 +30,8 @@ public class SocketServer {
     while (true) {
       // acept connection and start thread  
       Socket clientSocket = m_ServerSocket.accept();
-      SocketHandlerThread server = new SocketHandlerThread (clientSocket, threadCount);
-      server.start();
+//      System.out.println("Accepted connection from " + clientSocket.getInetAddress().getHostName());
+      executorService.submit(new SocketHandlerThread (clientSocket, threadCount));
     }
   }
 }

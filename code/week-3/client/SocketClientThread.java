@@ -27,8 +27,8 @@ public class SocketClientThread extends Thread {
     public SocketClientThread(String hostName, int port, CyclicBarrier barrier) {
         this.hostName = hostName;
         this.port = port;
-        clientID = Thread.currentThread().getId();
-        synk = barrier;
+        this.clientID = this.threadId();
+        this.synk = barrier;
         
     }
     
@@ -36,9 +36,18 @@ public class SocketClientThread extends Thread {
         
         try {
             // TO DO insert code to pass 1k messages to the SocketServer
+//            Thread.sleep(1000);
             Socket s = new Socket(hostName, port);
-           
-        
+            PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+//            System.out.println("Client Name is " + this.clientID);
+            out.println("Client Name is " + this.clientID);
+            System.out.println(in.readLine());
+
+            // After sending messages, log crossing the barrier
+            this.synk.await();
+            System.out.println(this.threadId() + " has crossed the barrier and continues execution");
+
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
@@ -46,9 +55,13 @@ public class SocketClientThread extends Thread {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
             System.exit(1);
-        } 
-        
-        // TO DO insert code to wait on the CyclicBarrier
+        } catch (BrokenBarrierException | InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+
+      // TO DO insert code to wait on the CyclicBarrier
+
+
         
     }
 }

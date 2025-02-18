@@ -36,9 +36,10 @@ public class SocketClientSingleThreaded {
                 new BufferedReader(
                     new InputStreamReader(s.getInputStream()));
             out.println("Client ID is " +  Long.toString(clientID));
-         
+
+
             System.out.println(in.readLine());
-         
+
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
